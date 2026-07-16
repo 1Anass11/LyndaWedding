@@ -7,9 +7,11 @@ import { Button } from '@/components/ui/button'
 
 interface RSVPFormProps {
   slug?: string
+  name1?: string
+  name2?: string
 }
 
-export function RSVPForm({ slug = 'demo-wedding' }: RSVPFormProps) {
+export function RSVPForm({ slug = 'demo-wedding', name1 = 'Lynda', name2 = 'Aymen' }: RSVPFormProps) {
   const [message, setMessage] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -94,7 +96,7 @@ export function RSVPForm({ slug = 'demo-wedding' }: RSVPFormProps) {
                 onChange={(e) => setMessage(e.target.value)}
                 required
                 className="w-full rounded-md border border-sage/30 bg-ivory px-3 py-2 text-sage-dark placeholder:text-sage-dark/50 focus:border-sage-dark focus:outline-none focus:ring-1 focus:ring-sage-dark"
-                placeholder="Laissez un message pour Lynda et Aymen..."
+                placeholder={`Laissez un message pour ${name1} et ${name2}...`}
                 rows={4}
               />
             </div>

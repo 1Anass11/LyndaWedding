@@ -110,6 +110,26 @@ export async function GET(
     const guestMessageSection =
       (content?.guestMessageSection as Record<string, unknown>) || null
 
+    // Optional per-invitation media overrides (cover image, opening video, hero video
+    // playlist, background audio). Falls back to the original Lynda & Aymen assets
+    // when not set, so existing invitations are unaffected. `introVideo: null` means
+    // "no opening video, cover image only" - distinct from the key being absent
+    // entirely, which means "use the default Lynda opening video".
+    const media = (hero.media as Record<string, unknown>) || {}
+    const hasIntroVideoKey = Object.prototype.hasOwnProperty.call(media, 'introVideo')
+    const heroMedia = {
+      coverImage: (media.coverImage as string) || undefined,
+      introVideo: hasIntroVideoKey ? (media.introVideo as string) || null : undefined,
+      heroVideos: Array.isArray(media.heroVideos)
+        ? (media.heroVideos as unknown[]).filter((v): v is string => typeof v === 'string')
+        : undefined,
+      audioEnabled: media.audioEnabled !== false,
+      variant: (media.variant as string) || 'classic',
+    }
+
+    const countdownEnabled =
+      (sections?.countdown as Record<string, unknown>)?.enabled !== false
+
     const accommodations = (
       (content?.accommodations as Array<Record<string, unknown>>) || []
     ).map((a, i) => ({
@@ -150,6 +170,8 @@ export async function GET(
         ? { label: String(guestMessageSection?.label ?? 'Écrivez un mot') }
         : null,
       accommodations,
+      hero_media: heroMedia,
+      countdown_enabled: countdownEnabled,
       settings: {
         rsvpEnabled: settings?.rsvpEnabled ?? true,
         previewEnabled: settings?.previewEnabled ?? true,

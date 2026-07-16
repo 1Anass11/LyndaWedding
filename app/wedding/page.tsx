@@ -3,9 +3,12 @@
 import { useState, useEffect, useRef } from 'react'
 import { IntroOverlay } from '@/components/wedding/IntroOverlay'
 import { HeroSection } from '@/components/wedding/HeroSection'
+import { SamarHeroSection } from '@/components/wedding/SamarHeroSection'
 import { CountdownSection } from '@/components/wedding/CountdownSection'
+import { SamarCountdownSection } from '@/components/wedding/SamarCountdownSection'
 import { LocationSection } from '@/components/wedding/LocationSection'
 import { RSVPForm } from '@/components/wedding/RSVPForm'
+import { SamarRSVPForm } from '@/components/wedding/SamarRSVPForm'
 import { Footer } from '@/components/wedding/Footer'
 import { SectionDivider } from '@/components/wedding/SectionDivider'
 import { MuteButton } from '@/components/wedding/MuteButton'
@@ -23,10 +26,20 @@ interface WeddingSettings {
   banquet_end_time?: string
 }
 
+interface HeroMedia {
+  coverImage?: string
+  introVideo?: string | null
+  heroVideos?: string[]
+  audioEnabled: boolean
+  variant?: 'classic' | 'oval'
+}
+
 interface WeddingData {
   wedding_settings: WeddingSettings
   countdown_target_iso?: string | null
   guestMessageSection?: { label: string } | null
+  hero_media?: HeroMedia
+  countdown_enabled?: boolean
 }
 
 const DEFAULTS: WeddingSettings = {
@@ -152,35 +165,89 @@ export default function WeddingPage({ initialSlug }: WeddingPageProps = {}) {
 
   const ws = data?.wedding_settings ?? DEFAULTS
   const guestMessage = data?.guestMessageSection
+  const heroMedia = data?.hero_media
+  const audioEnabled = heroMedia?.audioEnabled ?? true
+  const countdownEnabled = data?.countdown_enabled ?? true
+  const isOval = heroMedia?.variant === 'oval'
 
   return (
     <>
-      <audio ref={audioRef} src="/assets/intro-music-CzqJOUtA.mp3" preload="auto" loop />
+      {audioEnabled && (
+        <audio
+          ref={audioRef}
+          src={isOval ? '/samar/dome/ballerina-CzqJOUtA.mp3' : '/assets/intro-music-CzqJOUtA.mp3'}
+          preload="auto"
+          loop
+        />
+      )}
 
-      <MuteButton muted={muted} onToggle={toggleMute} />
+      {audioEnabled && <MuteButton muted={muted} onToggle={toggleMute} />}
 
       {showIntro ? (
         <IntroOverlay
           onEnter={() => setShowIntro(false)}
           onInteraction={handleInteraction}
+          posterSrc={heroMedia?.coverImage}
+          videoSrc={heroMedia?.introVideo}
         />
       ) : (
-        <main className="bg-background">
-          <HeroSection
-            name1={ws.couple_name_1}
-            name2={ws.couple_name_2}
-            date={ws.wedding_date}
-            subtitle={ws.hero_subtitle}
-          />
+        <main className={`bg-background relative${isOval ? ' theme-rose' : ''}`}>
+          {isOval && (
+            <div className="absolute inset-0 pointer-events-none z-10 hidden md:block" aria-hidden="true">
+              {[2, 25, 50, 75].map((top) => (
+                <img
+                  key={`left-${top}`}
+                  src="/samar/dome/floral-border-left-Dkgz06KD.png"
+                  alt=""
+                  className="absolute left-0 h-[300px] lg:h-[480px] w-auto object-contain object-left"
+                  style={{ top: `${top}%` }}
+                />
+              ))}
+              {[12, 38, 62, 88].map((top) => (
+                <img
+                  key={`right-${top}`}
+                  src="/samar/dome/floral-border-right-Crzv-gDh.png"
+                  alt=""
+                  className="absolute right-0 h-[320px] lg:h-[500px] w-auto object-contain object-right"
+                  style={{ top: `${top}%` }}
+                />
+              ))}
+            </div>
+          )}
+          {isOval ? (
+            <SamarHeroSection
+              name1={ws.couple_name_1}
+              name2={ws.couple_name_2}
+              date={ws.wedding_date}
+              subtitle={ws.hero_subtitle}
+              videos={heroMedia?.heroVideos}
+            />
+          ) : (
+            <HeroSection
+              name1={ws.couple_name_1}
+              name2={ws.couple_name_2}
+              date={ws.wedding_date}
+              subtitle={ws.hero_subtitle}
+              videos={heroMedia?.heroVideos}
+              posterSrc={heroMedia?.coverImage}
+            />
+          )}
 
-          
 
-          <CountdownSection
-            targetDate={ws.wedding_date}
-            countdownTargetISO={data?.countdown_target_iso}
-          />
 
-          
+          {countdownEnabled && (isOval ? (
+            <SamarCountdownSection
+              targetDate={ws.wedding_date}
+              countdownTargetISO={data?.countdown_target_iso}
+            />
+          ) : (
+            <CountdownSection
+              targetDate={ws.wedding_date}
+              countdownTargetISO={data?.countdown_target_iso}
+            />
+          ))}
+
+
 
           <LocationSection
             location={ws.banquet_location}
@@ -192,9 +259,13 @@ export default function WeddingPage({ initialSlug }: WeddingPageProps = {}) {
             weddingDate={ws.wedding_date}
           />
 
-          <SectionDivider />
+          <SectionDivider ornament={isOval ? 'floral' : 'star'} />
 
-          <RSVPForm slug={slug} />
+          {isOval ? (
+            <SamarRSVPForm slug={slug} name1={ws.couple_name_1} name2={ws.couple_name_2} />
+          ) : (
+            <RSVPForm slug={slug} name1={ws.couple_name_1} name2={ws.couple_name_2} />
+          )}
 
           
 

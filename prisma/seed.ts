@@ -214,12 +214,103 @@ async function main() {
 
   console.log('Created events:', ceremony.name, reception.name)
 
+  // Dedicated demo account for Mohamed & Samar – no password, cannot log in.
+  const samarOwner = await prisma.user.upsert({
+    where: { email: 'mohamed-samar@demo.wedding' },
+    create: {
+      email: 'mohamed-samar@demo.wedding',
+      name: 'Mohamed & Samar',
+      password: null,
+      role: UserRole.OWNER,
+    },
+    update: { name: 'Mohamed & Samar', password: null, role: UserRole.OWNER },
+  })
+
+  const samarContent = {
+    hero: {
+      names: ['Mohamed', 'Samar'],
+      date: '10/08/2026',
+      message: 'Nous avons le plaisir de vous inviter à célébrer notre mariage avec nous.',
+      media: {
+        coverImage: '/samar/dome/intro-poster-new-CfGsWpwh.jpg',
+        introVideo: '/samar/dome/intro-video-new-B2fF-r_n.mov',
+        heroVideos: ['/samar/dome/plantilla-floral-v2-Cl-HZWE8.mp4'],
+        audioEnabled: true,
+        variant: 'oval',
+      },
+    },
+    sections: {
+      story: { enabled: false, content: '' },
+      countdown: { enabled: true },
+      registry: { enabled: false },
+    },
+    faqs: [],
+    guestMessageSection: { enabled: false, label: 'Écrivez un mot' },
+    accommodations: [],
+  }
+
+  const samarSettings = {
+    rsvpEnabled: true,
+    previewEnabled: true,
+    allowEdit: false,
+    requireEmail: false,
+    requirePhone: false,
+  }
+
+  const samarInvitation = await prisma.invitation.upsert({
+    where: { slug: 'samar' },
+    create: {
+      ownerId: samarOwner.id,
+      slug: 'samar',
+      status: InvitationStatus.PUBLISHED,
+      publishedAt: new Date(),
+      title: 'Mariage Mohamed & Samar',
+      locale: 'fr',
+      eventDate: new Date('2026-08-10T17:00:00Z'),
+      themeId: theme2.id,
+      contentJson: samarContent,
+      settingsJson: samarSettings,
+    },
+    update: {
+      ownerId: samarOwner.id,
+      status: InvitationStatus.PUBLISHED,
+      publishedAt: new Date(),
+      themeId: theme2.id,
+      eventDate: new Date('2026-08-10T17:00:00Z'),
+      contentJson: samarContent,
+      settingsJson: samarSettings,
+    },
+  })
+
+  console.log('Created invitation:', samarInvitation.slug)
+
+  await prisma.event.deleteMany({ where: { invitationId: samarInvitation.id } })
+
+  const samarCeremony = await prisma.event.create({
+    data: {
+      invitationId: samarInvitation.id,
+      name: 'Cérémonie',
+      startsAt: new Date('2026-08-10T17:00:00Z'),
+      endsAt: new Date('2026-08-10T23:00:00Z'),
+      locationName: 'Royal Palace',
+      address: 'Royal Palace, Béni Khalled, Nabeul, Tunisia',
+      notes: null,
+    },
+  })
+
+  console.log('Created events:', samarCeremony.name)
+
   // Sharing links for the demo invitation (no login required – guests access via link only)
   const baseUrl = process.env.APP_URL || 'http://localhost:3000'
   console.log('\n--- Sharing links for Lynda & Aymen (demo-wedding) ---')
   console.log(`By user ID: ${baseUrl}/u/${demoOwner.id}`)
   console.log(`By slug:    ${baseUrl}/i/demo-wedding`)
   console.log(`Alt:        ${baseUrl}/wedding`)
+  console.log('--- Guests need no account. Share these links only. ---\n')
+
+  console.log('\n--- Sharing links for Mohamed & Samar (samar) ---')
+  console.log(`By user ID: ${baseUrl}/u/${samarOwner.id}`)
+  console.log(`By slug:    ${baseUrl}/i/samar`)
   console.log('--- Guests need no account. Share these links only. ---\n')
 
   console.log('Seed completed successfully!')

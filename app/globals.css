@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Great+Vibes&family=Lora:wght@400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -42,9 +40,9 @@
     --countdown: 72 16% 43%;
     
     /* Fonts */
-    --font-display: "Cormorant Garamond", serif;
-    --font-script: "Great Vibes", cursive;
-    --font-body: "Lora", serif;
+    --font-display: var(--font-cormorant-garamond), serif;
+    --font-script: var(--font-great-vibes), cursive;
+    --font-body: var(--font-lora), serif;
     
     /* Transitions */
     --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -61,6 +59,46 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+  }
+
+  /* Rose/blush theme for invitations using the oval hero variant (e.g. /i/samar).
+     Values ported 1:1 from the doMe "Roses Template" reference so components can
+     reuse the same shadcn token classes (bg-primary, bg-card, text-muted-foreground...)
+     as the source and match it exactly. */
+  .theme-rose {
+    --background: 0 0% 99%;
+    --foreground: 350 25% 25%;
+    --card: 30 35% 97%;
+    --card-foreground: 350 25% 25%;
+    --popover: 30 40% 98%;
+    --popover-foreground: 350 25% 25%;
+    --primary: 5 51% 35%;
+    --primary-foreground: 30 40% 98%;
+    --secondary: 350 25% 92%;
+    --secondary-foreground: 350 30% 35%;
+    --muted: 145 20% 90%;
+    --muted-foreground: 350 15% 45%;
+    --accent: 350 30% 88%;
+    --accent-foreground: 350 25% 30%;
+    --border: 350 15% 88%;
+    --input: 350 15% 88%;
+    --ring: 5 51% 35%;
+    --countdown: 5 51% 35%;
+
+    --ivory: 0 0% 99%;
+    --cream: 30 35% 96%;
+    --sage: 145 25% 70%;
+    --sage-dark: 5 51% 35%;
+    --sage-light: 145 20% 90%;
+    --gold: 5 51% 35%;
+    --gold-soft: 340 40% 75%;
+
+    --shadow-soft: 0 2px 8px rgba(180, 130, 140, .08);
+    --shadow-elegant: 0 8px 32px rgba(180, 130, 140, .12);
+
+    --font-display: var(--font-cormorant-garamond), serif;
+    --font-script: var(--font-pinyon-script), cursive;
+    --font-body: var(--font-eb-garamond), serif;
   }
 }
 
@@ -122,6 +160,12 @@
   }
   .text-gold {
     color: hsl(var(--gold));
+  }
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+  .shadow-elegant {
+    box-shadow: var(--shadow-elegant);
   }
 
   .wedding-page {

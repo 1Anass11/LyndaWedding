@@ -32113,9 +32113,6 @@ function l5({
             }), p.jsx("p", {
                 className: "text-sm text-white/80 font-body tracking-wide",
                 children: r
-            }), p.jsx("p", {
-                className: "text-xs text-white/60 mt-8 font-body",
-                children: "Réalisé par The Digital Yes"
             })]
         })
     })

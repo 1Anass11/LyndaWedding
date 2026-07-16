@@ -1,5 +1,6 @@
 'use client'
 
+import { useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
 
@@ -8,6 +9,8 @@ interface HeroSectionProps {
   name2: string
   date: string
   subtitle?: string
+  videos?: string[]
+  posterSrc?: string
 }
 
 function formatDate(raw: string): string {
@@ -21,22 +24,39 @@ function formatDate(raw: string): string {
   return '09 avril 2026'
 }
 
-export function HeroSection({ name1, name2, date, subtitle }: HeroSectionProps) {
+export function HeroSection({
+  name1,
+  name2,
+  date,
+  subtitle,
+  videos,
+  posterSrc = '/assets/hero-illustration-DrhagIJw.png',
+}: HeroSectionProps) {
   const formattedDate = formatDate(date)
+  const playlist = videos && videos.length > 0 ? videos : ['/assets/intro-video-BSNlV4m4.webm']
+  const [videoIndex, setVideoIndex] = useState(0)
+  const videoRef = useRef<HTMLVideoElement>(null)
 
   const scrollToRSVP = () => {
     document.getElementById('rsvp')?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  const handleVideoEnded = () => {
+    setVideoIndex((i) => (i + 1) % playlist.length)
   }
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-ivory">
       <div className="absolute inset-0">
         <video
-          src="/assets/intro-video-BSNlV4m4.webm"
-          poster="/assets/hero-illustration-DrhagIJw.png"
+          ref={videoRef}
+          key={playlist[videoIndex]}
+          src={playlist[videoIndex]}
+          poster={posterSrc}
           className="w-full h-full object-cover object-center"
           autoPlay
-          loop
+          loop={playlist.length === 1}
+          onEnded={playlist.length > 1 ? handleVideoEnded : undefined}
           muted
           playsInline
         />

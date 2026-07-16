@@ -42,3 +42,7 @@ next-env.d.ts
 required_assets.json
 missing_assets.json
 unused_assets.json
+
+# third-party template mirror - reference only, never ship
+rosas_template/
+doMe/

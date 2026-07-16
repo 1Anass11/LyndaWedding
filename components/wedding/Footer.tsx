@@ -39,7 +39,7 @@ export function Footer({ name1, name2, date }: FooterProps) {
           {formattedDate}
         </p>
         <p className="text-xs text-white/60 mt-8 font-body">
-          Réalisé par The Digital Yes
+          Avec tout notre amour
         </p>
       </motion.div>
     </footer>
