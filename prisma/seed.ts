@@ -232,8 +232,8 @@ async function main() {
       date: '10/08/2026',
       message: 'Nous avons le plaisir de vous inviter à célébrer notre mariage avec nous.',
       media: {
-        coverImage: '/samar/dome/intro-poster-new-CfGsWpwh.jpg',
-        introVideo: '/samar/dome/intro-video-new-B2fF-r_n.mov',
+        coverImage: '/samar/dome/video_MS-cover.jpg',
+        introVideo: '/samar/dome/video_MS.mp4',
         heroVideos: ['/samar/dome/plantilla-floral-v2-Cl-HZWE8.mp4'],
         audioEnabled: true,
         variant: 'oval',
