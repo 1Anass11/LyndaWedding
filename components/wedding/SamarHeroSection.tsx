@@ -96,9 +96,15 @@ export function SamarHeroSection({ name1, name2, date, secondDate, subtitle, vid
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.9, delay: 0.2 }}
-          className="font-script text-3xl md:text-4xl text-foreground mb-6"
+          className="font-script text-3xl md:text-4xl text-foreground mb-6 text-center"
         >
-          {subtitle || (isArabic ? 'نحن نتزوج' : 'Nous nous marions')}
+          {(subtitle || (isArabic ? 'نحن نتزوج' : 'Nous nous marions'))
+            .split('\n')
+            .map((line, i) => (
+              <span key={i} className="block">
+                {line}
+              </span>
+            ))}
         </motion.p>
 
         <motion.h1

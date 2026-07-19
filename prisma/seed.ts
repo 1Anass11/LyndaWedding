@@ -156,6 +156,7 @@ async function main() {
       ownerId: demoOwner.id,
       status: InvitationStatus.PUBLISHED,
       publishedAt: new Date(),
+      title: 'Demo Wedding',
       themeId: theme1.id,
       eventDate: new Date('2026-04-09T06:15:00Z'),
       contentJson: {
@@ -214,16 +215,19 @@ async function main() {
 
   console.log('Created events:', ceremony.name, reception.name)
 
-  // Dedicated demo account for Mohamed & Samar – no password, cannot log in.
+  // Account for Mohamed & Samar - owns all four Samar/Outiya invitations
+  // (samar, samar-ar, samar-outiya, samar-outiya-ar), so logging in here shows
+  // all four on the dashboard, each with its own RSVP messages page.
+  const samarOwnerPassword = await bcrypt.hash('wedding10082026', 10)
   const samarOwner = await prisma.user.upsert({
-    where: { email: 'mohamed-samar@demo.wedding' },
+    where: { email: 'wedding@samar.mohamed.com' },
     create: {
-      email: 'mohamed-samar@demo.wedding',
+      email: 'wedding@samar.mohamed.com',
       name: 'Mohamed & Samar',
-      password: null,
+      password: samarOwnerPassword,
       role: UserRole.OWNER,
     },
-    update: { name: 'Mohamed & Samar', password: null, role: UserRole.OWNER },
+    update: { name: 'Mohamed & Samar', password: samarOwnerPassword, role: UserRole.OWNER },
   })
 
   const samarContent = {
@@ -275,6 +279,7 @@ async function main() {
       ownerId: samarOwner.id,
       status: InvitationStatus.PUBLISHED,
       publishedAt: new Date(),
+      title: 'Mariage Mohamed & Samar',
       themeId: theme2.id,
       eventDate: new Date('2026-08-10T17:00:00Z'),
       contentJson: samarContent,
@@ -353,6 +358,7 @@ async function main() {
       ownerId: samarOwner.id,
       status: InvitationStatus.PUBLISHED,
       publishedAt: new Date(),
+      title: 'حفل زفاف محمد وسمر',
       themeId: theme2.id,
       eventDate: new Date('2026-08-10T20:00:00Z'),
       contentJson: samarArContent,
@@ -386,7 +392,7 @@ async function main() {
       names: ['Mohamed', 'Samar'],
       date: '07/08/2026',
       secondDate: '10/08/2026',
-      subtitle: 'Invitation de mariage et Outiya',
+      subtitle: 'Invitation de mariage\net Outiya',
       message: 'Nous avons le plaisir de vous inviter à célébrer notre Outiya avec nous.',
       media: {
         coverImage: '/samar/dome/video_MS-cover.jpg',
@@ -432,6 +438,7 @@ async function main() {
       ownerId: samarOwner.id,
       status: InvitationStatus.PUBLISHED,
       publishedAt: new Date(),
+      title: 'Outiya - Mohamed & Samar',
       themeId: theme2.id,
       eventDate: new Date('2026-08-07T20:00:00Z'),
       contentJson: samarOutiyaContent,
@@ -478,7 +485,7 @@ async function main() {
       names: ['محمد', 'سمر'],
       date: '07/08/2026',
       secondDate: '10/08/2026',
-      subtitle: 'دعوة الزفاف والوطية',
+      subtitle: 'دعوة الزفاف\nوالوطية',
       message: 'يسعدنا دعوتكم للاحتفال بالوطية معنا.',
       media: {
         coverImage: '/samar/dome/video_MS-cover.jpg',
@@ -524,6 +531,7 @@ async function main() {
       ownerId: samarOwner.id,
       status: InvitationStatus.PUBLISHED,
       publishedAt: new Date(),
+      title: 'الوطية - محمد وسمر',
       themeId: theme2.id,
       eventDate: new Date('2026-08-07T20:00:00Z'),
       contentJson: samarOutiyaArContent,
