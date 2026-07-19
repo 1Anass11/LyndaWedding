@@ -17,6 +17,7 @@ interface WeddingSettings {
   couple_name_1: string
   couple_name_2: string
   wedding_date: string
+  hero_second_date?: string | null
   hero_subtitle: string
   banquet_location: string
   banquet_address: string | null
@@ -43,6 +44,7 @@ interface EventDetail {
   locationName: string | null
   address: string | null
   mapsUrl: string | null
+  imageUrl: string | null
 }
 
 interface WeddingData {
@@ -53,6 +55,17 @@ interface WeddingData {
   hero_media?: HeroMedia
   countdown_enabled?: boolean
   events_detail?: EventDetail[]
+}
+
+function formatEventDate(isoOrDateString: string, isArabic?: boolean): string {
+  const raw = isoOrDateString.includes('T') ? isoOrDateString : `${isoOrDateString}T12:00:00`
+  const d = new Date(raw)
+  if (Number.isNaN(d.getTime())) return isoOrDateString
+  return d.toLocaleDateString(isArabic ? 'ar-TN-u-nu-latn' : 'fr-FR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  })
 }
 
 const DEFAULTS: WeddingSettings = {
@@ -246,6 +259,7 @@ export default function WeddingPage({ initialSlug }: WeddingPageProps = {}) {
               name1={ws.couple_name_1}
               name2={ws.couple_name_2}
               date={ws.wedding_date}
+              secondDate={ws.hero_second_date ?? undefined}
               subtitle={ws.hero_subtitle}
               videos={heroMedia?.heroVideos}
               isArabic={isArabic}
@@ -269,7 +283,6 @@ export default function WeddingPage({ initialSlug }: WeddingPageProps = {}) {
                 data?.events_detail && data.events_detail.length > 0
                   ? data.events_detail
                   : null
-              const showEventLabels = (events?.length ?? 0) > 1
 
               if (!events) {
                 // No per-event detail available (shouldn't happen for oval invitations,
@@ -305,7 +318,8 @@ export default function WeddingPage({ initialSlug }: WeddingPageProps = {}) {
                       id={i === 0 ? 'countdown' : `countdown-${ev.id}`}
                       targetDate={ev.startsAtISO.slice(0, 10)}
                       countdownTargetISO={ev.startsAtISO}
-                      eventName={showEventLabels ? ev.name : undefined}
+                      eventName={ev.name}
+                      dateLabel={formatEventDate(ev.startsAtISO, isArabic)}
                       isArabic={isArabic}
                     />
                   )}
@@ -313,11 +327,12 @@ export default function WeddingPage({ initialSlug }: WeddingPageProps = {}) {
                     location={ev.locationName ?? undefined}
                     address={ev.address}
                     mapsUrl={ev.mapsUrl}
+                    venueImageUrl={ev.imageUrl ?? undefined}
                     startTime={ev.startTime}
                     endTime={ev.endTime ?? undefined}
                     weddingDate={ev.startsAtISO.slice(0, 10)}
                     isArabic={isArabic}
-                    eventName={showEventLabels ? ev.name : undefined}
+                    eventName={ev.name}
                     showHeader={i === 0}
                   />
                 </div>

@@ -9,6 +9,8 @@ interface SamarCountdownSectionProps {
   isArabic?: boolean
   /** Distinguishing label shown above the countdown, e.g. the event name when a page has more than one (wedding day vs. Outiya). */
   eventName?: string
+  /** Formatted date shown just above the countdown grid. */
+  dateLabel?: string
   /** DOM id for the section wrapper; defaults to "countdown". Pass a unique value when rendering more than one instance on the same page. */
   id?: string
 }
@@ -32,6 +34,7 @@ export function SamarCountdownSection({
   countdownTargetISO,
   isArabic,
   eventName,
+  dateLabel,
   id = 'countdown',
 }: SamarCountdownSectionProps) {
   const normalizedDate = /^\d{4}-\d{2}-\d{2}/.test(targetDate) ? targetDate : '2026-04-09'
@@ -111,10 +114,22 @@ export function SamarCountdownSection({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="font-script text-5xl md:text-6xl text-foreground mb-16"
+          className={`font-script text-5xl md:text-6xl text-foreground${dateLabel ? ' mb-4' : ' mb-16'}`}
         >
           {isArabic ? 'حتى يومنا الكبير' : "Jusqu'au grand jour"}
         </motion.h2>
+
+        {dateLabel && (
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="font-display text-lg md:text-xl text-foreground/80 italic mb-12"
+          >
+            {dateLabel}
+          </motion.p>
+        )}
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}

@@ -148,7 +148,7 @@ export function LocationSection({
 
           <div className="mb-6 rounded-lg overflow-hidden border border-sage/30">
             <iframe
-              src={buildMapsEmbedUrl(locationName)}
+              src={mapsUrl ? `${mapsUrl}&output=embed` : buildMapsEmbedUrl(locationName)}
               width="100%"
               height="200"
               style={{ border: 0 }}

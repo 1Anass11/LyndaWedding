@@ -289,30 +289,17 @@ async function main() {
   const samarCeremony = await prisma.event.create({
     data: {
       invitationId: samarInvitation.id,
-      name: 'Cérémonie',
+      name: 'Mariage',
       startsAt: new Date('2026-08-10T20:00:00Z'),
       endsAt: null,
       locationName: 'Salle des fêtes Royal Palace',
       address: 'Salle des fêtes Royal Palace, Béni Khalled, Nabeul, Tunisia',
+      imageUrl: '/samar/dome/royal_palace.jpg',
       notes: null,
     },
   })
 
-  const samarOutiya = await prisma.event.create({
-    data: {
-      invitationId: samarInvitation.id,
-      name: 'Outiya',
-      startsAt: new Date('2026-08-07T20:00:00Z'),
-      endsAt: null,
-      locationName: 'Soliman Plage',
-      address: null,
-      mapLat: 36.73031,
-      mapLng: 10.46827,
-      notes: null,
-    },
-  })
-
-  console.log('Created events:', samarCeremony.name, samarOutiya.name)
+  console.log('Created events:', samarCeremony.name)
 
   // Arabic (RTL) version of the Mohamed & Samar invitation, same design/media/colors,
   // additive alongside the French `samar` slug (does not replace it).
@@ -385,25 +372,12 @@ async function main() {
       endsAt: null,
       locationName: 'Salle des fêtes Royal Palace',
       address: 'Salle des fêtes Royal Palace, Béni Khalled, Nabeul, Tunisia',
+      imageUrl: '/samar/dome/royal_palace.jpg',
       notes: null,
     },
   })
 
-  const samarArOutiya = await prisma.event.create({
-    data: {
-      invitationId: samarArInvitation.id,
-      name: 'الوطية',
-      startsAt: new Date('2026-08-07T20:00:00Z'),
-      endsAt: null,
-      locationName: 'Soliman Plage',
-      address: null,
-      mapLat: 36.73031,
-      mapLng: 10.46827,
-      notes: null,
-    },
-  })
-
-  console.log('Created events:', samarArCeremony.name, samarArOutiya.name)
+  console.log('Created events:', samarArCeremony.name)
 
   // Outiya (Tunisian pre-wedding day, hosted by the bride) — separate pages from the
   // wedding day itself, same design/media, own date/countdown/place. French + Arabic.
@@ -411,7 +385,8 @@ async function main() {
     hero: {
       names: ['Mohamed', 'Samar'],
       date: '07/08/2026',
-      subtitle: 'Outiya',
+      secondDate: '10/08/2026',
+      subtitle: 'Invitation de mariage et Outiya',
       message: 'Nous avons le plaisir de vous inviter à célébrer notre Outiya avec nous.',
       media: {
         coverImage: '/samar/dome/video_MS-cover.jpg',
@@ -485,11 +460,12 @@ async function main() {
   const samarOutiyaWedding = await prisma.event.create({
     data: {
       invitationId: samarOutiyaInvitation.id,
-      name: 'Cérémonie',
+      name: 'Mariage',
       startsAt: new Date('2026-08-10T20:00:00Z'),
       endsAt: null,
       locationName: 'Salle des fêtes Royal Palace',
       address: 'Salle des fêtes Royal Palace, Béni Khalled, Nabeul, Tunisia',
+      imageUrl: '/samar/dome/royal_palace.jpg',
       notes: null,
     },
   })
@@ -501,7 +477,8 @@ async function main() {
     hero: {
       names: ['محمد', 'سمر'],
       date: '07/08/2026',
-      subtitle: 'الوطية',
+      secondDate: '10/08/2026',
+      subtitle: 'دعوة الزفاف والوطية',
       message: 'يسعدنا دعوتكم للاحتفال بالوطية معنا.',
       media: {
         coverImage: '/samar/dome/video_MS-cover.jpg',
@@ -580,6 +557,7 @@ async function main() {
       endsAt: null,
       locationName: 'Salle des fêtes Royal Palace',
       address: 'Salle des fêtes Royal Palace, Béni Khalled, Nabeul, Tunisia',
+      imageUrl: '/samar/dome/royal_palace.jpg',
       notes: null,
     },
   })

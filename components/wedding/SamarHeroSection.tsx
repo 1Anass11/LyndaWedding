@@ -8,6 +8,8 @@ interface SamarHeroSectionProps {
   name1: string
   name2: string
   date: string
+  /** Second date shown below the main one, e.g. a page inviting to both the Outiya day and the wedding day. */
+  secondDate?: string
   subtitle?: string
   videos?: string[]
   isArabic?: boolean
@@ -24,8 +26,9 @@ function formatDate(raw: string, isArabic?: boolean): string {
   return raw
 }
 
-export function SamarHeroSection({ name1, name2, date, subtitle, videos, isArabic }: SamarHeroSectionProps) {
+export function SamarHeroSection({ name1, name2, date, secondDate, subtitle, videos, isArabic }: SamarHeroSectionProps) {
   const formattedDate = formatDate(date, isArabic)
+  const formattedSecondDate = secondDate ? formatDate(secondDate, isArabic) : null
   const playlist = videos && videos.length > 0 ? videos : []
   // Two stacked video elements cross-fade on transition instead of remounting
   // a single element, which avoids a blank/grey flash while the next clip loads.
@@ -138,6 +141,17 @@ export function SamarHeroSection({ name1, name2, date, subtitle, videos, isArabi
         >
           {formattedDate}
         </motion.p>
+
+        {formattedSecondDate && (
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1.0 }}
+            className="font-display text-base md:text-lg tracking-wider text-foreground/60 italic mt-1"
+          >
+            {formattedSecondDate}
+          </motion.p>
+        )}
       </div>
 
       <motion.button

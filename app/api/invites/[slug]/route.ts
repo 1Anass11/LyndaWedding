@@ -40,6 +40,16 @@ export async function GET(
     const heroDate = (hero.date as string) || '9 avril 2026'
     const heroMessage = (hero.message as string) || ''
 
+    // Optional second date shown alongside the main one (e.g. a page that invites to
+    // both the Outiya day and the wedding day itself) - parsed the same way heroDate's
+    // fallback is, into YYYY-MM-DD so the frontend can format it consistently.
+    const heroSecondDateRaw = hero.secondDate as string | undefined
+    const heroSecondDate = (() => {
+      if (!heroSecondDateRaw) return null
+      const m = heroSecondDateRaw.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/)
+      return m ? `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}` : null
+    })()
+
     // Format wedding_date as YYYY-MM-DD for countdown/calendar
     const eventDate = invitation.eventDate
     let weddingDate = eventDate?.toISOString().slice(0, 10)
@@ -55,11 +65,14 @@ export async function GET(
     const address = firstEvent?.address || null
     const mapLat = firstEvent?.mapLat
     const mapLng = firstEvent?.mapLng
+    // Plain Maps URL for the "Open in Maps" link - NOT an embed URL. `output=embed`
+    // only works inside an <iframe>; used as a direct link it triggers Google's
+    // "The Google Maps Embed API must be used in an iframe" error page.
     const mapsUrl =
       address || (mapLat != null && mapLng != null)
         ? `https://www.google.com/maps?q=${encodeURIComponent(
             address || `${mapLat},${mapLng}`
-          )}&output=embed`
+          )}`
         : null
 
     const banquetStartTime =
@@ -82,12 +95,15 @@ export async function GET(
       endTime: ev.endsAt != null ? formatTimeInAppTz(ev.endsAt) : null,
       locationName: ev.locationName || null,
       address: ev.address || null,
+      // Plain Maps URL for the "Open in Maps" link - see note above; the iframe
+      // embed appends its own `output=embed` in LocationSection.
       mapsUrl:
         ev.address || (ev.mapLat != null && ev.mapLng != null)
           ? `https://www.google.com/maps?q=${encodeURIComponent(
               ev.address || `${ev.mapLat},${ev.mapLng}`
-            )}&output=embed`
+            )}`
           : null,
+      imageUrl: ev.imageUrl || null,
     }))
 
     // Build timeline from events (or use contentJson.timeline if present)
@@ -168,6 +184,7 @@ export async function GET(
       couple_name_1: heroNames[0] || 'Lynda',
       couple_name_2: heroNames[1] || 'Aymen',
       wedding_date: finalWeddingDate,
+      hero_second_date: heroSecondDate,
       hero_subtitle: (hero.subtitle as string) || 'Nous nous marions',
       banquet_location: locationName,
       banquet_address: address,
