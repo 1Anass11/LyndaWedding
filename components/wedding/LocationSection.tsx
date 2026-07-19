@@ -23,6 +23,11 @@ interface LocationSectionProps {
   startTime?: string
   endTime?: string
   weddingDate?: string
+  isArabic?: boolean
+  /** Distinguishing label shown above "Lieu", e.g. the event name when a page has more than one (wedding day vs. Outiya). */
+  eventName?: string
+  /** Whether to render the "Détails du jour" section intro. Set false on repeated instances so the intro only shows once. */
+  showHeader?: boolean
 }
 
 function buildCalendarUrl(
@@ -47,8 +52,11 @@ export function LocationSection({
   mapsUrl,
   venueImageUrl,
   startTime = '18:00',
-  endTime = '01:00',
+  endTime,
   weddingDate = '2026-04-09',
+  isArabic,
+  eventName,
+  showHeader = true,
 }: LocationSectionProps) {
   const imageSrc = getVenueImageSrc(venueImageUrl)
   const locationName = location || 'Jardin de réception'
@@ -62,25 +70,27 @@ export function LocationSection({
   return (
     <section className="section-padding bg-ivory">
       <div className="max-w-4xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <img
-            src="/assets/champagne-illustration-CplOg0Lb.png"
-            alt="Illustration de coupes de champagne"
-            className="w-64 mx-auto mb-6"
-          />
-          <h2 className="font-script text-4xl md:text-5xl text-sage-dark mb-2">
-            Détails du jour
-          </h2>
-          <p className="text-sage-dark/70 font-body tracking-wide">
-            Tout ce que vous devez savoir
-          </p>
-        </motion.div>
+        {showHeader && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <img
+              src="/assets/champagne-illustration-CplOg0Lb.png"
+              alt={isArabic ? 'رسم توضيحي لكؤوس الشمبانيا' : 'Illustration de coupes de champagne'}
+              className="w-64 mx-auto mb-6"
+            />
+            <h2 className="font-script text-4xl md:text-5xl text-sage-dark mb-2">
+              {isArabic ? 'تفاصيل اليوم' : 'Détails du jour'}
+            </h2>
+            <p className={`text-sage-dark/70 font-body${isArabic ? '' : ' tracking-wide'}`}>
+              {isArabic ? 'كل ما تحتاجون معرفته' : 'Tout ce que vous devez savoir'}
+            </p>
+          </motion.div>
+        )}
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -93,7 +103,14 @@ export function LocationSection({
             <MapPin className="w-7 h-7 text-sage-dark" />
           </div>
 
-          <h3 className="font-display text-2xl text-sage-dark mb-4">Lieu</h3>
+          {eventName && (
+            <p className="font-display text-sm uppercase tracking-widest text-sage-dark/60 mb-1">
+              {eventName}
+            </p>
+          )}
+          <h3 className="font-display text-2xl text-sage-dark mb-4">
+            {isArabic ? 'المكان' : 'Lieu'}
+          </h3>
 
           <div className="space-y-3 mb-6">
             <div className="flex items-center justify-center gap-2">
@@ -109,7 +126,13 @@ export function LocationSection({
             <div className="flex items-center justify-center gap-2 mt-4 text-sage-dark/70">
               <Clock className="w-4 h-4" />
               <span className="font-body">
-                De {startTime.replace(':00', '')}h à {endTime.replace(':00', '')}h
+                {isArabic
+                  ? endTime
+                    ? `من الساعة ${startTime.replace(':00', '')} إلى ${endTime.replace(':00', '')}`
+                    : `الساعة ${startTime.replace(':00', '')}`
+                  : endTime
+                    ? `De ${startTime.replace(':00', '')}h à ${endTime.replace(':00', '')}h`
+                    : `À ${startTime.replace(':00', '')}h`}
               </span>
             </div>
           </div>
@@ -117,7 +140,7 @@ export function LocationSection({
           <div className="mb-6 rounded-lg overflow-hidden border border-sage/30 relative group">
             <img
               src={imageSrc}
-              alt={venueImageUrl ? 'Photo du lieu' : 'Vue du lieu'}
+              alt={isArabic ? 'صورة المكان' : venueImageUrl ? 'Photo du lieu' : 'Vue du lieu'}
               className="w-full h-64 md:h-80 object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-sage-dark/40 via-transparent to-transparent pointer-events-none" />
@@ -132,7 +155,7 @@ export function LocationSection({
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title={`Carte de ${locationName}`}
+              title={isArabic ? `خريطة ${locationName}` : `Carte de ${locationName}`}
               className="sepia-[0.15] hover:sepia-0 transition-all duration-500"
             />
           </div>
@@ -149,7 +172,7 @@ export function LocationSection({
                 )}
               >
                 <MapPin className="w-4 h-4" />
-                Ouvrir dans Maps
+                {isArabic ? 'افتح في الخرائط' : 'Ouvrir dans Maps'}
               </a>
             )}
             <a
@@ -162,7 +185,7 @@ export function LocationSection({
               )}
             >
               <Calendar className="w-4 h-4" />
-              Ajouter au calendrier
+              {isArabic ? 'أضف إلى التقويم' : 'Ajouter au calendrier'}
             </a>
           </div>
         </motion.div>

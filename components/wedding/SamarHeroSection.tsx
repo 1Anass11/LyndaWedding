@@ -10,11 +10,12 @@ interface SamarHeroSectionProps {
   date: string
   subtitle?: string
   videos?: string[]
+  isArabic?: boolean
 }
 
-function formatDate(raw: string): string {
+function formatDate(raw: string, isArabic?: boolean): string {
   if (/^\d{4}-\d{2}-\d{2}/.test(raw)) {
-    return new Date(raw + 'T12:00:00').toLocaleDateString('fr-FR', {
+    return new Date(raw + 'T12:00:00').toLocaleDateString(isArabic ? 'ar-TN-u-nu-latn' : 'fr-FR', {
       day: '2-digit',
       month: 'long',
       year: 'numeric',
@@ -23,8 +24,8 @@ function formatDate(raw: string): string {
   return raw
 }
 
-export function SamarHeroSection({ name1, name2, date, subtitle, videos }: SamarHeroSectionProps) {
-  const formattedDate = formatDate(date)
+export function SamarHeroSection({ name1, name2, date, subtitle, videos, isArabic }: SamarHeroSectionProps) {
+  const formattedDate = formatDate(date, isArabic)
   const playlist = videos && videos.length > 0 ? videos : []
   // Two stacked video elements cross-fade on transition instead of remounting
   // a single element, which avoids a blank/grey flash while the next clip loads.
@@ -94,7 +95,7 @@ export function SamarHeroSection({ name1, name2, date, subtitle, videos }: Samar
           transition={{ duration: 0.9, delay: 0.2 }}
           className="font-script text-3xl md:text-4xl text-foreground mb-6"
         >
-          {subtitle || 'Nous nous marions'}
+          {subtitle || (isArabic ? 'نحن نتزوج' : 'Nous nous marions')}
         </motion.p>
 
         <motion.h1
@@ -103,13 +104,17 @@ export function SamarHeroSection({ name1, name2, date, subtitle, videos }: Samar
           transition={{ duration: 1, delay: 0.4 }}
           className="mb-6"
         >
-          <span className="font-display text-3xl md:text-5xl tracking-[0.15em] uppercase text-foreground block">
+          <span
+            className={`font-display text-3xl md:text-5xl text-foreground block${isArabic ? ' italic' : ' tracking-[0.15em] uppercase'}`}
+          >
             {name1}
           </span>
           <span className="font-script text-2xl md:text-3xl text-foreground/80 italic block my-1">
-            &amp;
+            {isArabic ? 'و' : '&'}
           </span>
-          <span className="font-display text-3xl md:text-5xl tracking-[0.15em] uppercase text-foreground block">
+          <span
+            className={`font-display text-3xl md:text-5xl text-foreground block${isArabic ? ' italic' : ' tracking-[0.15em] uppercase'}`}
+          >
             {name2}
           </span>
         </motion.h1>
@@ -142,8 +147,8 @@ export function SamarHeroSection({ name1, name2, date, subtitle, videos }: Samar
         onClick={scrollToRSVP}
         className="absolute bottom-8 inset-x-0 z-20 flex flex-col items-center gap-2 text-center text-foreground/60 hover:text-primary transition-colors cursor-pointer"
       >
-        <span className="text-xs tracking-[0.3em] uppercase font-body">
-          Votre présence rendra ce jour plus spécial ❤️
+        <span className={`text-xs font-body${isArabic ? '' : ' tracking-[0.3em] uppercase'}`}>
+          {isArabic ? 'حضوركم يزيدنا سعادة بهذا اليوم ❤️' : 'Votre présence rendra ce jour plus spécial ❤️'}
         </span>
         <motion.div
           animate={{ y: [0, 8, 0] }}

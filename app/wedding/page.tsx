@@ -23,7 +23,7 @@ interface WeddingSettings {
   banquet_maps_url: string | null
   banquet_image_url?: string | null
   banquet_start_time?: string
-  banquet_end_time?: string
+  banquet_end_time?: string | null
 }
 
 interface HeroMedia {
@@ -34,12 +34,25 @@ interface HeroMedia {
   variant?: 'classic' | 'oval'
 }
 
+interface EventDetail {
+  id: string
+  name: string
+  startsAtISO: string
+  startTime: string
+  endTime: string | null
+  locationName: string | null
+  address: string | null
+  mapsUrl: string | null
+}
+
 interface WeddingData {
+  locale?: string
   wedding_settings: WeddingSettings
   countdown_target_iso?: string | null
   guestMessageSection?: { label: string } | null
   hero_media?: HeroMedia
   countdown_enabled?: boolean
+  events_detail?: EventDetail[]
 }
 
 const DEFAULTS: WeddingSettings = {
@@ -140,6 +153,17 @@ export default function WeddingPage({ initialSlug }: WeddingPageProps = {}) {
     return () => document.removeEventListener('visibilitychange', handler)
   }, [muted])
 
+  const isArabic = data?.locale === 'ar'
+
+  useEffect(() => {
+    document.documentElement.dir = isArabic ? 'rtl' : 'ltr'
+    document.documentElement.lang = isArabic ? 'ar' : 'en'
+    return () => {
+      document.documentElement.dir = 'ltr'
+      document.documentElement.lang = 'en'
+    }
+  }, [isArabic])
+
   const handleInteraction = () => {
     const audio = audioRef.current
     if (audio?.paused) audio.play().catch(() => {})
@@ -181,7 +205,7 @@ export default function WeddingPage({ initialSlug }: WeddingPageProps = {}) {
         />
       )}
 
-      {audioEnabled && <MuteButton muted={muted} onToggle={toggleMute} />}
+      {audioEnabled && <MuteButton muted={muted} onToggle={toggleMute} isArabic={isArabic} />}
 
       {showIntro ? (
         <IntroOverlay
@@ -191,7 +215,10 @@ export default function WeddingPage({ initialSlug }: WeddingPageProps = {}) {
           videoSrc={heroMedia?.introVideo}
         />
       ) : (
-        <main className={`bg-background relative${isOval ? ' theme-rose' : ''}`}>
+        <main
+          dir={isArabic ? 'rtl' : 'ltr'}
+          className={`bg-background relative${isOval ? ' theme-rose' : ''}`}
+        >
           {isOval && (
             <div className="absolute inset-0 pointer-events-none z-10 hidden md:block" aria-hidden="true">
               {[2, 25, 50, 75].map((top) => (
@@ -221,6 +248,7 @@ export default function WeddingPage({ initialSlug }: WeddingPageProps = {}) {
               date={ws.wedding_date}
               subtitle={ws.hero_subtitle}
               videos={heroMedia?.heroVideos}
+              isArabic={isArabic}
             />
           ) : (
             <HeroSection
@@ -235,34 +263,90 @@ export default function WeddingPage({ initialSlug }: WeddingPageProps = {}) {
 
 
 
-          {countdownEnabled && (isOval ? (
-            <SamarCountdownSection
-              targetDate={ws.wedding_date}
-              countdownTargetISO={data?.countdown_target_iso}
-            />
+          {isOval ? (
+            (() => {
+              const events =
+                data?.events_detail && data.events_detail.length > 0
+                  ? data.events_detail
+                  : null
+              const showEventLabels = (events?.length ?? 0) > 1
+
+              if (!events) {
+                // No per-event detail available (shouldn't happen for oval invitations,
+                // but keeps the page working if it ever does) - fall back to the
+                // single banquet_* summary, same as the classic template does.
+                return (
+                  <>
+                    {countdownEnabled && (
+                      <SamarCountdownSection
+                        targetDate={ws.wedding_date}
+                        countdownTargetISO={data?.countdown_target_iso}
+                        isArabic={isArabic}
+                      />
+                    )}
+                    <LocationSection
+                      location={ws.banquet_location}
+                      address={ws.banquet_address}
+                      mapsUrl={ws.banquet_maps_url}
+                      venueImageUrl={ws.banquet_image_url}
+                      startTime={ws.banquet_start_time ?? '18:00'}
+                      endTime={ws.banquet_end_time ?? undefined}
+                      weddingDate={ws.wedding_date}
+                      isArabic={isArabic}
+                    />
+                  </>
+                )
+              }
+
+              return events.map((ev, i) => (
+                <div key={ev.id}>
+                  {countdownEnabled && (
+                    <SamarCountdownSection
+                      id={i === 0 ? 'countdown' : `countdown-${ev.id}`}
+                      targetDate={ev.startsAtISO.slice(0, 10)}
+                      countdownTargetISO={ev.startsAtISO}
+                      eventName={showEventLabels ? ev.name : undefined}
+                      isArabic={isArabic}
+                    />
+                  )}
+                  <LocationSection
+                    location={ev.locationName ?? undefined}
+                    address={ev.address}
+                    mapsUrl={ev.mapsUrl}
+                    startTime={ev.startTime}
+                    endTime={ev.endTime ?? undefined}
+                    weddingDate={ev.startsAtISO.slice(0, 10)}
+                    isArabic={isArabic}
+                    eventName={showEventLabels ? ev.name : undefined}
+                    showHeader={i === 0}
+                  />
+                </div>
+              ))
+            })()
           ) : (
-            <CountdownSection
-              targetDate={ws.wedding_date}
-              countdownTargetISO={data?.countdown_target_iso}
-            />
-          ))}
-
-
-
-          <LocationSection
-            location={ws.banquet_location}
-            address={ws.banquet_address}
-            mapsUrl={ws.banquet_maps_url}
-            venueImageUrl={ws.banquet_image_url}
-            startTime={ws.banquet_start_time ?? '18:00'}
-            endTime={ws.banquet_end_time ?? '01:00'}
-            weddingDate={ws.wedding_date}
-          />
+            <>
+              {countdownEnabled && (
+                <CountdownSection
+                  targetDate={ws.wedding_date}
+                  countdownTargetISO={data?.countdown_target_iso}
+                />
+              )}
+              <LocationSection
+                location={ws.banquet_location}
+                address={ws.banquet_address}
+                mapsUrl={ws.banquet_maps_url}
+                venueImageUrl={ws.banquet_image_url}
+                startTime={ws.banquet_start_time ?? '18:00'}
+                endTime={ws.banquet_end_time ?? undefined}
+                weddingDate={ws.wedding_date}
+              />
+            </>
+          )}
 
           <SectionDivider ornament={isOval ? 'floral' : 'star'} />
 
           {isOval ? (
-            <SamarRSVPForm slug={slug} name1={ws.couple_name_1} name2={ws.couple_name_2} />
+            <SamarRSVPForm slug={slug} name1={ws.couple_name_1} name2={ws.couple_name_2} isArabic={isArabic} />
           ) : (
             <RSVPForm slug={slug} name1={ws.couple_name_1} name2={ws.couple_name_2} />
           )}
@@ -273,6 +357,7 @@ export default function WeddingPage({ initialSlug }: WeddingPageProps = {}) {
             name1={ws.couple_name_1}
             name2={ws.couple_name_2}
             date={ws.wedding_date}
+            isArabic={isArabic}
           />
         </main>
       )}

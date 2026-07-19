@@ -7,11 +7,12 @@ interface FooterProps {
   name1: string
   name2: string
   date: string
+  isArabic?: boolean
 }
 
-function formatDate(raw: string): string {
+function formatDate(raw: string, isArabic?: boolean): string {
   if (/^\d{4}-\d{2}-\d{2}/.test(raw)) {
-    return new Date(raw + 'T12:00:00').toLocaleDateString('fr-FR', {
+    return new Date(raw + 'T12:00:00').toLocaleDateString(isArabic ? 'ar-TN-u-nu-latn' : 'fr-FR', {
       day: '2-digit',
       month: 'long',
       year: 'numeric',
@@ -20,8 +21,8 @@ function formatDate(raw: string): string {
   return '09 avril 2026'
 }
 
-export function Footer({ name1, name2, date }: FooterProps) {
-  const formattedDate = formatDate(date)
+export function Footer({ name1, name2, date, isArabic }: FooterProps) {
+  const formattedDate = formatDate(date, isArabic)
 
   return (
     <footer className="py-16 bg-sage-dark text-center">
@@ -33,13 +34,13 @@ export function Footer({ name1, name2, date }: FooterProps) {
       >
         <Heart className="w-6 h-6 mx-auto mb-4 text-white/70" />
         <p className="font-script text-3xl text-white mb-2">
-          {name1} &amp; {name2}
+          {name1} {isArabic ? 'و' : '&'} {name2}
         </p>
-        <p className="text-sm text-white/80 font-body tracking-wide">
+        <p className={`text-sm text-white/80 font-body${isArabic ? '' : ' tracking-wide'}`}>
           {formattedDate}
         </p>
         <p className="text-xs text-white/60 mt-8 font-body">
-          Avec tout notre amour
+          {isArabic ? 'بكل الحب' : 'Avec tout notre amour'}
         </p>
       </motion.div>
     </footer>

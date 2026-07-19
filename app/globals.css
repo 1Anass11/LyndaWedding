@@ -100,6 +100,14 @@
     --font-script: var(--font-pinyon-script), cursive;
     --font-body: var(--font-eb-garamond), serif;
   }
+
+  /* Arabic variant of the rose theme: same burgundy/rose/cream palette, RTL-appropriate
+     Arabic typefaces instead (Amiri for headings/names, Tajawal for body/UI). */
+  .theme-rose[dir='rtl'] {
+    --font-display: var(--font-amiri), serif;
+    --font-script: var(--font-amiri), serif;
+    --font-body: var(--font-tajawal), sans-serif;
+  }
 }
 
 @layer base {

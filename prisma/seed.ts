@@ -290,15 +290,301 @@ async function main() {
     data: {
       invitationId: samarInvitation.id,
       name: 'Cérémonie',
-      startsAt: new Date('2026-08-10T17:00:00Z'),
-      endsAt: new Date('2026-08-10T23:00:00Z'),
-      locationName: 'Royal Palace',
-      address: 'Royal Palace, Béni Khalled, Nabeul, Tunisia',
+      startsAt: new Date('2026-08-10T20:00:00Z'),
+      endsAt: null,
+      locationName: 'Salle des fêtes Royal Palace',
+      address: 'Salle des fêtes Royal Palace, Béni Khalled, Nabeul, Tunisia',
       notes: null,
     },
   })
 
-  console.log('Created events:', samarCeremony.name)
+  const samarOutiya = await prisma.event.create({
+    data: {
+      invitationId: samarInvitation.id,
+      name: 'Outiya',
+      startsAt: new Date('2026-08-07T20:00:00Z'),
+      endsAt: null,
+      locationName: 'Soliman Plage',
+      address: null,
+      mapLat: 36.73031,
+      mapLng: 10.46827,
+      notes: null,
+    },
+  })
+
+  console.log('Created events:', samarCeremony.name, samarOutiya.name)
+
+  // Arabic (RTL) version of the Mohamed & Samar invitation, same design/media/colors,
+  // additive alongside the French `samar` slug (does not replace it).
+  const samarArContent = {
+    hero: {
+      names: ['محمد', 'سمر'],
+      date: '10/08/2026',
+      subtitle: 'نحن نتزوج',
+      message: 'يسعدنا دعوتكم للاحتفال بزفافنا معنا.',
+      media: {
+        coverImage: '/samar/dome/video_MS-cover.jpg',
+        introVideo: '/samar/dome/video_MS.mp4',
+        heroVideos: ['/samar/dome/plantilla-floral-v2-Cl-HZWE8.mp4'],
+        audioEnabled: true,
+        variant: 'oval',
+      },
+    },
+    sections: {
+      story: { enabled: false, content: '' },
+      countdown: { enabled: true },
+      registry: { enabled: false },
+    },
+    faqs: [],
+    guestMessageSection: { enabled: false, label: 'اكتبوا كلمة' },
+    accommodations: [],
+  }
+
+  const samarArSettings = {
+    rsvpEnabled: true,
+    previewEnabled: true,
+    allowEdit: false,
+    requireEmail: false,
+    requirePhone: false,
+  }
+
+  const samarArInvitation = await prisma.invitation.upsert({
+    where: { slug: 'samar-ar' },
+    create: {
+      ownerId: samarOwner.id,
+      slug: 'samar-ar',
+      status: InvitationStatus.PUBLISHED,
+      publishedAt: new Date(),
+      title: 'حفل زفاف محمد وسمر',
+      locale: 'ar',
+      eventDate: new Date('2026-08-10T20:00:00Z'),
+      themeId: theme2.id,
+      contentJson: samarArContent,
+      settingsJson: samarArSettings,
+    },
+    update: {
+      ownerId: samarOwner.id,
+      status: InvitationStatus.PUBLISHED,
+      publishedAt: new Date(),
+      themeId: theme2.id,
+      eventDate: new Date('2026-08-10T20:00:00Z'),
+      contentJson: samarArContent,
+      settingsJson: samarArSettings,
+    },
+  })
+
+  console.log('Created invitation:', samarArInvitation.slug)
+
+  await prisma.event.deleteMany({ where: { invitationId: samarArInvitation.id } })
+
+  const samarArCeremony = await prisma.event.create({
+    data: {
+      invitationId: samarArInvitation.id,
+      name: 'حفل الزفاف',
+      startsAt: new Date('2026-08-10T20:00:00Z'),
+      endsAt: null,
+      locationName: 'Salle des fêtes Royal Palace',
+      address: 'Salle des fêtes Royal Palace, Béni Khalled, Nabeul, Tunisia',
+      notes: null,
+    },
+  })
+
+  const samarArOutiya = await prisma.event.create({
+    data: {
+      invitationId: samarArInvitation.id,
+      name: 'الوطية',
+      startsAt: new Date('2026-08-07T20:00:00Z'),
+      endsAt: null,
+      locationName: 'Soliman Plage',
+      address: null,
+      mapLat: 36.73031,
+      mapLng: 10.46827,
+      notes: null,
+    },
+  })
+
+  console.log('Created events:', samarArCeremony.name, samarArOutiya.name)
+
+  // Outiya (Tunisian pre-wedding day, hosted by the bride) — separate pages from the
+  // wedding day itself, same design/media, own date/countdown/place. French + Arabic.
+  const samarOutiyaContent = {
+    hero: {
+      names: ['Mohamed', 'Samar'],
+      date: '07/08/2026',
+      subtitle: 'Outiya',
+      message: 'Nous avons le plaisir de vous inviter à célébrer notre Outiya avec nous.',
+      media: {
+        coverImage: '/samar/dome/video_MS-cover.jpg',
+        introVideo: '/samar/dome/video_MS.mp4',
+        heroVideos: ['/samar/dome/plantilla-floral-v2-Cl-HZWE8.mp4'],
+        audioEnabled: true,
+        variant: 'oval',
+      },
+    },
+    sections: {
+      story: { enabled: false, content: '' },
+      countdown: { enabled: true },
+      registry: { enabled: false },
+    },
+    faqs: [],
+    guestMessageSection: { enabled: false, label: 'Écrivez un mot' },
+    accommodations: [],
+  }
+
+  const samarOutiyaSettings = {
+    rsvpEnabled: true,
+    previewEnabled: true,
+    allowEdit: false,
+    requireEmail: false,
+    requirePhone: false,
+  }
+
+  const samarOutiyaInvitation = await prisma.invitation.upsert({
+    where: { slug: 'samar-outiya' },
+    create: {
+      ownerId: samarOwner.id,
+      slug: 'samar-outiya',
+      status: InvitationStatus.PUBLISHED,
+      publishedAt: new Date(),
+      title: 'Outiya - Mohamed & Samar',
+      locale: 'fr',
+      eventDate: new Date('2026-08-07T20:00:00Z'),
+      themeId: theme2.id,
+      contentJson: samarOutiyaContent,
+      settingsJson: samarOutiyaSettings,
+    },
+    update: {
+      ownerId: samarOwner.id,
+      status: InvitationStatus.PUBLISHED,
+      publishedAt: new Date(),
+      themeId: theme2.id,
+      eventDate: new Date('2026-08-07T20:00:00Z'),
+      contentJson: samarOutiyaContent,
+      settingsJson: samarOutiyaSettings,
+    },
+  })
+
+  console.log('Created invitation:', samarOutiyaInvitation.slug)
+
+  await prisma.event.deleteMany({ where: { invitationId: samarOutiyaInvitation.id } })
+
+  const samarOutiyaEvent = await prisma.event.create({
+    data: {
+      invitationId: samarOutiyaInvitation.id,
+      name: 'Outiya',
+      startsAt: new Date('2026-08-07T20:00:00Z'),
+      endsAt: null,
+      locationName: 'Soliman Plage',
+      address: null,
+      mapLat: 36.73031,
+      mapLng: 10.46827,
+      notes: null,
+    },
+  })
+
+  const samarOutiyaWedding = await prisma.event.create({
+    data: {
+      invitationId: samarOutiyaInvitation.id,
+      name: 'Cérémonie',
+      startsAt: new Date('2026-08-10T20:00:00Z'),
+      endsAt: null,
+      locationName: 'Salle des fêtes Royal Palace',
+      address: 'Salle des fêtes Royal Palace, Béni Khalled, Nabeul, Tunisia',
+      notes: null,
+    },
+  })
+
+  console.log('Created events:', samarOutiyaEvent.name, samarOutiyaWedding.name)
+
+  // Arabic (RTL) version of the Outiya page — same pattern as samar-ar.
+  const samarOutiyaArContent = {
+    hero: {
+      names: ['محمد', 'سمر'],
+      date: '07/08/2026',
+      subtitle: 'الوطية',
+      message: 'يسعدنا دعوتكم للاحتفال بالوطية معنا.',
+      media: {
+        coverImage: '/samar/dome/video_MS-cover.jpg',
+        introVideo: '/samar/dome/video_MS.mp4',
+        heroVideos: ['/samar/dome/plantilla-floral-v2-Cl-HZWE8.mp4'],
+        audioEnabled: true,
+        variant: 'oval',
+      },
+    },
+    sections: {
+      story: { enabled: false, content: '' },
+      countdown: { enabled: true },
+      registry: { enabled: false },
+    },
+    faqs: [],
+    guestMessageSection: { enabled: false, label: 'اكتبوا كلمة' },
+    accommodations: [],
+  }
+
+  const samarOutiyaArSettings = {
+    rsvpEnabled: true,
+    previewEnabled: true,
+    allowEdit: false,
+    requireEmail: false,
+    requirePhone: false,
+  }
+
+  const samarOutiyaArInvitation = await prisma.invitation.upsert({
+    where: { slug: 'samar-outiya-ar' },
+    create: {
+      ownerId: samarOwner.id,
+      slug: 'samar-outiya-ar',
+      status: InvitationStatus.PUBLISHED,
+      publishedAt: new Date(),
+      title: 'الوطية - محمد وسمر',
+      locale: 'ar',
+      eventDate: new Date('2026-08-07T20:00:00Z'),
+      themeId: theme2.id,
+      contentJson: samarOutiyaArContent,
+      settingsJson: samarOutiyaArSettings,
+    },
+    update: {
+      ownerId: samarOwner.id,
+      status: InvitationStatus.PUBLISHED,
+      publishedAt: new Date(),
+      themeId: theme2.id,
+      eventDate: new Date('2026-08-07T20:00:00Z'),
+      contentJson: samarOutiyaArContent,
+      settingsJson: samarOutiyaArSettings,
+    },
+  })
+
+  console.log('Created invitation:', samarOutiyaArInvitation.slug)
+
+  await prisma.event.deleteMany({ where: { invitationId: samarOutiyaArInvitation.id } })
+
+  const samarOutiyaArEvent = await prisma.event.create({
+    data: {
+      invitationId: samarOutiyaArInvitation.id,
+      name: 'الوطية',
+      startsAt: new Date('2026-08-07T20:00:00Z'),
+      endsAt: null,
+      locationName: 'Soliman Plage',
+      address: null,
+      mapLat: 36.73031,
+      mapLng: 10.46827,
+      notes: null,
+    },
+  })
+
+  const samarOutiyaArWedding = await prisma.event.create({
+    data: {
+      invitationId: samarOutiyaArInvitation.id,
+      name: 'حفل الزفاف',
+      startsAt: new Date('2026-08-10T20:00:00Z'),
+      endsAt: null,
+      locationName: 'Salle des fêtes Royal Palace',
+      address: 'Salle des fêtes Royal Palace, Béni Khalled, Nabeul, Tunisia',
+      notes: null,
+    },
+  })
+
+  console.log('Created events:', samarOutiyaArEvent.name, samarOutiyaArWedding.name)
 
   // Sharing links for the demo invitation (no login required – guests access via link only)
   const baseUrl = process.env.APP_URL || 'http://localhost:3000'
@@ -311,6 +597,18 @@ async function main() {
   console.log('\n--- Sharing links for Mohamed & Samar (samar) ---')
   console.log(`By user ID: ${baseUrl}/u/${samarOwner.id}`)
   console.log(`By slug:    ${baseUrl}/i/samar`)
+  console.log('--- Guests need no account. Share these links only. ---\n')
+
+  console.log('\n--- Sharing links for Mohamed & Samar, Arabic (samar-ar) ---')
+  console.log(`By slug:    ${baseUrl}/i/samar-ar`)
+  console.log('--- Guests need no account. Share these links only. ---\n')
+
+  console.log('\n--- Sharing links for Outiya (samar-outiya) ---')
+  console.log(`By slug:    ${baseUrl}/i/samar-outiya`)
+  console.log('--- Guests need no account. Share these links only. ---\n')
+
+  console.log('\n--- Sharing links for Outiya, Arabic (samar-outiya-ar) ---')
+  console.log(`By slug:    ${baseUrl}/i/samar-outiya-ar`)
   console.log('--- Guests need no account. Share these links only. ---\n')
 
   console.log('Seed completed successfully!')

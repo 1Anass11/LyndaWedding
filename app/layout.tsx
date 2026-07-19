@@ -6,6 +6,8 @@ import {
   Lora,
   Pinyon_Script,
   EB_Garamond,
+  Amiri,
+  Tajawal,
 } from 'next/font/google'
 import './globals.css'
 
@@ -40,6 +42,18 @@ const ebGaramond = EB_Garamond({
   style: ['normal', 'italic'],
   variable: '--font-eb-garamond',
 })
+// Arabic wedding pairing: Amiri (elegant serif, headings/names) + Tajawal (clean sans, body/UI)
+const amiri = Amiri({
+  subsets: ['arabic', 'latin'],
+  weight: ['400', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-amiri',
+})
+const tajawal = Tajawal({
+  subsets: ['arabic', 'latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-tajawal',
+})
 
 export const metadata: Metadata = {
   title: 'Digital Wedding Invitations',
@@ -54,7 +68,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.className} ${cormorantGaramond.variable} ${greatVibes.variable} ${lora.variable} ${pinyonScript.variable} ${ebGaramond.variable}`}
+        className={`${inter.className} ${cormorantGaramond.variable} ${greatVibes.variable} ${lora.variable} ${pinyonScript.variable} ${ebGaramond.variable} ${amiri.variable} ${tajawal.variable}`}
       >
         {children}
       </body>

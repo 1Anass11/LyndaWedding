@@ -6,6 +6,11 @@ import { motion } from 'framer-motion'
 interface SamarCountdownSectionProps {
   targetDate: string
   countdownTargetISO?: string | null
+  isArabic?: boolean
+  /** Distinguishing label shown above the countdown, e.g. the event name when a page has more than one (wedding day vs. Outiya). */
+  eventName?: string
+  /** DOM id for the section wrapper; defaults to "countdown". Pass a unique value when rendering more than one instance on the same page. */
+  id?: string
 }
 
 interface TimeLeft {
@@ -16,13 +21,19 @@ interface TimeLeft {
 }
 
 const LABELS = [
-  { key: 'days', label: 'Jours' },
-  { key: 'hours', label: 'Heures' },
-  { key: 'minutes', label: 'Minutes' },
-  { key: 'seconds', label: 'Secondes' },
+  { key: 'days', label: 'Jours', labelAr: 'أيام' },
+  { key: 'hours', label: 'Heures', labelAr: 'ساعات' },
+  { key: 'minutes', label: 'Minutes', labelAr: 'دقائق' },
+  { key: 'seconds', label: 'Secondes', labelAr: 'ثواني' },
 ] as const
 
-export function SamarCountdownSection({ targetDate, countdownTargetISO }: SamarCountdownSectionProps) {
+export function SamarCountdownSection({
+  targetDate,
+  countdownTargetISO,
+  isArabic,
+  eventName,
+  id = 'countdown',
+}: SamarCountdownSectionProps) {
   const normalizedDate = /^\d{4}-\d{2}-\d{2}/.test(targetDate) ? targetDate : '2026-04-09'
 
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({
@@ -67,21 +78,32 @@ export function SamarCountdownSection({ targetDate, countdownTargetISO }: SamarC
   }, [normalizedDate, countdownTargetISO])
 
   return (
-    <section id="countdown" className="section-padding bg-background relative">
+    <section id={id} className="section-padding bg-background relative">
       <img
         src="/samar/dome/floral-small-CunO5Md5.png"
         alt=""
-        className="absolute top-4 left-4 w-20 md:w-28 pointer-events-none z-10"
+        className={`absolute top-4 w-20 md:w-28 pointer-events-none z-10${isArabic ? ' right-4' : ' left-4'}`}
       />
       <div className="max-w-4xl mx-auto text-center">
+        {eventName && (
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="font-display text-xl md:text-2xl text-foreground mb-1 italic"
+          >
+            {eventName}
+          </motion.p>
+        )}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-primary text-xs md:text-sm font-body tracking-[0.4em] uppercase mb-4"
+          className={`text-primary text-xs md:text-sm font-body mb-4${isArabic ? '' : ' tracking-[0.4em] uppercase'}`}
         >
-          Compte à rebours
+          {isArabic ? 'العد التنازلي' : 'Compte à rebours'}
         </motion.p>
 
         <motion.h2
@@ -91,7 +113,7 @@ export function SamarCountdownSection({ targetDate, countdownTargetISO }: SamarC
           transition={{ duration: 0.6, delay: 0.1 }}
           className="font-script text-5xl md:text-6xl text-foreground mb-16"
         >
-          Jusqu&apos;au grand jour
+          {isArabic ? 'حتى يومنا الكبير' : "Jusqu'au grand jour"}
         </motion.h2>
 
         <motion.div
@@ -115,8 +137,10 @@ export function SamarCountdownSection({ targetDate, countdownTargetISO }: SamarC
                   {String(timeLeft[item.key]).padStart(2, '0')}
                 </span>
               </div>
-              <span className="block mt-3 text-[9px] md:text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-body">
-                {item.label}
+              <span
+                className={`block mt-3 text-[9px] md:text-[10px] text-muted-foreground font-body${isArabic ? '' : ' tracking-[0.2em] uppercase'}`}
+              >
+                {isArabic ? item.labelAr : item.label}
               </span>
             </motion.div>
           ))}

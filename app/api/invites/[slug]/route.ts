@@ -69,7 +69,26 @@ export async function GET(
         ? formatTimeInAppTz(lastEvent.endsAt)
         : firstEvent?.endsAt != null
           ? formatTimeInAppTz(firstEvent.endsAt)
-          : '01:00'
+          : null
+
+    // Full per-event detail (name/date/countdown target/place), used by templates that
+    // show every event on the page (e.g. the oval Samar template's wedding + Outiya days)
+    // instead of collapsing everything into the single banquet_* fields above.
+    const eventsDetail = invitation.events.map((ev) => ({
+      id: ev.id,
+      name: ev.name,
+      startsAtISO: ev.startsAt.toISOString(),
+      startTime: formatTimeInAppTz(ev.startsAt),
+      endTime: ev.endsAt != null ? formatTimeInAppTz(ev.endsAt) : null,
+      locationName: ev.locationName || null,
+      address: ev.address || null,
+      mapsUrl:
+        ev.address || (ev.mapLat != null && ev.mapLng != null)
+          ? `https://www.google.com/maps?q=${encodeURIComponent(
+              ev.address || `${ev.mapLat},${ev.mapLng}`
+            )}&output=embed`
+          : null,
+    }))
 
     // Build timeline from events (or use contentJson.timeline if present)
     const timelineFromContent = (content?.timeline as Array<Record<string, unknown>>) || []
@@ -162,9 +181,11 @@ export async function GET(
     const countdownTargetISO = getCountdownTargetISO(finalWeddingDate, 18)
 
     return NextResponse.json({
+      locale: invitation.locale,
       wedding_settings: weddingSettings,
       countdown_target_iso: countdownTargetISO,
       events: timeline,
+      events_detail: eventsDetail,
       faqs,
       guestMessageSection: guestMessageSection?.enabled
         ? { label: String(guestMessageSection?.label ?? 'Écrivez un mot') }
